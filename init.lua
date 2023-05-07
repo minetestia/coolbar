@@ -1,49 +1,38 @@
-local ms = minetest.settings
-local function log(...)
-  for _, any in ipairs { ... } do
-    minetest.log(dump(any))
-  end
-end
+local settings = minetest.settings
 
--- Name of the main player's inventory list.
-local inv_name = tostring(ms:get "coolbar.inv_name" or "main")
--- Visible panel size (excluding inventory and hidden slots).
-local panel_size = tonumber(ms:get "coolbar.panel_size" or 8)
--- Visible inventory size (excluding panel and hidden slots).
-local inv_size = tonumber(ms:get "coolbar.inv_size" or 24)
--- Index of the first slot on a panel.
-local panel_start = tonumber(ms:get "coolbar.panel_start" or 1)
+-- Visible bar size (excluding inventory and hidden slots).
+local bar_size = tonumber(settings:get "coolbar.bar_size" or 8) --[[@as integer]]
+-- Visible inventory size (excluding bar and hidden slots).
+local inv_size = tonumber(settings:get "coolbar.inv_size" or 24) --[[@as integer]]
+-- Index of the first slot on a bar.
+local bar_start = tonumber(settings:get "coolbar.bar_start" or 1) --[[@as integer]]
 -- Index of the first inventory slot.
-local inv_start = tonumber(ms:get "coolbar.inv_start" or 9)
--- The last slot on panel
-local panel_end = panel_start + panel_size - 1
+local inv_start = tonumber(settings:get "coolbar.inv_start" or 9) --[[@as integer]]
+-- The last slot on bar
+local bar_end = bar_start + bar_size - 1
 -- The last inventory slot
 local inv_end = inv_start + inv_size - 1
--- Default builtin array of itemstrings preferred to keep on the panel.
-local builtin_panel_slots = {
+-- Default builtin array of itemstrings preferred to keep on the bar.
+local default_bar_slots = {
   "group:sword",
-  "group:axe",
-  "group:pickaxe",
   "group:shovel",
+  "group:pickaxe",
+  "group:axe",
   "default:water_bucket",
-  "group:dirt",
+  "group:soil",
   "default:apple",
   "group:torch",
 }
--- Array of itemstrings preferred to keep on the panel.
+-- Array of itemstrings preferred to keep on the bar.
 ---@type mt.ItemString[]
-local preferred_panel_slots = {}
-for i = 1, panel_size do
+local preferred_bar_slots = {}
+for i = 1, bar_size do
   local slot =
-    tostring(ms:get("coolbar.slot_" .. i) or builtin_panel_slots[i] or "")
-  preferred_panel_slots[i] = slot
+    tostring(settings:get("coolbar.slot_" .. i) or default_bar_slots[i] or "")
+  preferred_bar_slots[i] = slot
 end
 
--- All players inventory lists, indexed by player name.
----@type table<string, mt.ItemStack[]>
-local inv_lists = {}
-
--- Check if item corresponds to itemstring, including groups.
+-- Check if item corresponds to itemstring, including "group:something" format.
 ---@param item mt.ItemStack
 ---@param is mt.ItemString
 ---@return boolean
@@ -57,74 +46,110 @@ local function item_is(item, is)
   return false
 end
 
-local function put_item_in_empty_slot(player_name, item_index)
-  local preferred_item_name = preferred_panel_slots[item_index]
-  local player = minetest.get_player_by_name(player_name)
-  local inv = player:get_inventory()
-  if not inv then return end
-  local inv_list = inv:get_list(inv_name)
-  for i = inv_start, inv_end do
-    if item_is(inv_list[i], preferred_item_name) then
-      inv:set_stack(inv_name, item_index, inv_list[i])
-      inv:set_stack(inv_name, i, ItemStack "")
-      return
+---@param player mt.PlayerObjectRef
+---@param old_item mt.ItemStack
+---@param new_item mt.ItemStack
+---@param index integer
+local function handle_item_increase(player, old_item, new_item, index)
+  ---@return boolean is_it, integer|nil should_be
+  local function is_new_item_position_correct()
+    if old_item:get_name() == new_item:get_name() then return true, index end
+    local should_be
+    for i, preferred in ipairs(preferred_bar_slots) do
+      if item_is(new_item, preferred) then
+        should_be = i
+        break
+      end
     end
+    if should_be == index then return true, should_be end
+    if index >= inv_start and index <= inv_end then
+      if should_be then return false, should_be end
+      return true, should_be
+    end
+    return false, should_be
   end
+
+  local is_it, should_be = is_new_item_position_correct()
+  -- log(("[%s] : [%s == %s]"):format(is_it, item_index, should_be))
+  if is_it then return end
+
+  local inv = player:get_inventory()
+  local list = inv:get_list "main"
+  if should_be and list[should_be]:get_free_space() == 0 then
+    should_be = nil
+  end
+  local new_item_name = new_item:get_name()
+  local slot_empty, slot_same ---@type integer, integer|nil
+  for i = inv_start, inv_end do
+    local name = list[i]:get_name()
+    if not slot_empty and name == "" then
+      slot_empty = i
+    elseif
+      not slot_same
+      and name == new_item_name
+      and list[i]:get_free_space() > 0
+    then
+      slot_same = i
+    end
+    if slot_same and slot_empty then break end
+  end
+  if not slot_empty then return end
+  -- log(("empty: [%s], same: [%s]"):format(slot_empty, slot_same))
+
+  local stack_from = list[index]
+  local stack_to = list[should_be or slot_same or slot_empty]
+
+  local taken = stack_from:take_item(stack_from:get_count())
+  local leftover = stack_to:add_item(taken)
+  list[slot_empty]:add_item(leftover)
+
+  inv:set_list("main", list)
+  minetestia.player_inventory_main_lists[player:get_player_name()] = list
 end
 
-local function on_player_inv_change(player_name, item, item_index)
-  local item_name = item:get_name()
-  if
-    item_name == ""
-    and item_index >= panel_start
-    and item_index <= panel_end
-    and preferred_panel_slots[item_index - panel_start + 1] ~= ""
-  then
-    put_item_in_empty_slot(player_name, item_index)
+---@param player mt.PlayerObjectRef
+---@param old_item mt.ItemStack
+---@param new_item mt.ItemStack
+---@param item_index integer
+local function handle_bar_decrease(player, old_item, new_item, item_index)
+  local inv = player:get_inventory()
+  local list = inv:get_list "main"
+  local target_item = new_item:get_name()
+
+  if target_item == "" then
+    local bar_index = item_index - bar_start + 1
+    local preferred = preferred_bar_slots[bar_index]
+    if not item_is(old_item, preferred) then
+      target_item = old_item:get_name()
+    else
+      target_item = preferred
+    end
+  end
+
+  for i = inv_start, inv_end do
+    local inv_stack = list[i]
+    if item_is(inv_stack, target_item) then
+      local bar_stack = list[item_index]
+      local leftover = bar_stack:add_item(inv_stack)
+      list[i] = leftover
+      if bar_stack:get_count() == bar_stack:get_stack_max() then break end
+      if not leftover or leftover:get_name() ~= "" then break end
+    end
+  end
+  inv:set_list("main", list)
+  minetestia.player_inventory_main_lists[player:get_player_name()] = list
+end
+
+---@type mf.on_player_inventory_change
+local function on_player_inv_change(player, old_item, new_item, i, action, info)
+  if info and info.from_list == "main" then return end
+  if new_item:get_count() >= old_item:get_count() then
+    handle_item_increase(player, old_item, new_item, i)
     return
   end
-end
-
----@param player_name string
-local function detect_player_inv_changes(player_name)
-  local inv = minetest.get_inventory { type = "player", name = player_name }
-  local old_list = inv_lists[player_name]
-  local new_list = inv:get_list(inv_name)
-
-  for i, new_item in ipairs(new_list) do
-    local old_item = old_list[i]
-    if new_item ~= old_item then
-      inv_lists[player_name][i] = new_item
-      on_player_inv_change(player_name, new_item, i)
-    end
+  if i >= bar_start and i <= bar_end then
+    handle_bar_decrease(player, old_item, new_item, i)
   end
 end
 
----------------------
--- REGISTER EVENTS --
----------------------
-
-minetest.register_on_player_inventory_action(
-  function(player, action, inventory, inventory_info)
-    detect_player_inv_changes(player:get_player_name())
-  end
-)
-
-minetest.register_on_dignode(
-  function(pos, oldnode, player)
-    detect_player_inv_changes(player:get_player_name())
-  end
-)
-
-minetest.register_on_item_pickup(
-  function(itemstack, player, pointed_thing, time_from_last_punch)
-    minetest.after(0.1, detect_player_inv_changes, player:get_player_name())
-  end
-)
-
-minetest.register_on_joinplayer(
-  function(player)
-    inv_lists[player:get_player_name()] =
-      player:get_inventory():get_list(inv_name)
-  end
-)
+minetestia.register_on_player_inventory_change(on_player_inv_change)
