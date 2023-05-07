@@ -1,0 +1,44 @@
+# Name of the main player's inventory list.
+coolbar.inv_name (Inventory name) string main
+
+# Visible panel size (excluding inventory and hidden slots).
+coolbar.panel_size (Panel size) int 8
+
+# Visible inventory size (excluding panel and hidden slots).
+coolbar.inv_size (Inventory rows) int 24
+
+# Index of the first slot on a panel.
+coolbar.panel_start (Panel start) int 1
+
+# Index of the first inventory slot.
+coolbar.inv_start (Inventory start) int 9
+
+# Name of the item in the slot #1.
+coolbar.slot_1 (Slot 1) string group:sword
+
+# Name of the item in the slot #2.
+coolbar.slot_2 (Slot 2) string group:axe
+
+# Name of the item in the slot #3.
+coolbar.slot_3 (Slot 3) string group:pickaxe
+
+# Name of the item in the slot #4.
+coolbar.slot_4 (Slot 4) string group:shovel
+
+# Name of the item in the slot #5.
+coolbar.slot_5 (Slot 5) string default:water_bucket
+
+# Name of the item in the slot #6.
+coolbar.slot_6 (Slot 6) string group:dirt
+
+# Name of the item in the slot #7.
+coolbar.slot_7 (Slot 7) string default:apple
+
+# Name of the item in the slot #8.
+coolbar.slot_8 (Slot 8) string group:torch
+
+# Name of the item in the slot #9.
+coolbar.slot_9 (Slot 9) string 
+
+# Name of the item in the slot #10.
+coolbar.slot_10 (Slot 10) string 
