@@ -15,7 +15,7 @@ shift-clicking!
 
 ![demo](images/screenrecord.gif)
 
-## Explanation of behavior
+## Explanation of the mod behavior
 
 - The mod has a preferences that specifies one or more types of items for each
   slot on the bar. However, these settings can also be empty.
