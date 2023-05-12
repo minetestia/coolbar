@@ -1,41 +1,63 @@
+# The number of visible inventory rows (excluding bar and hidden slots).
+coolbar.inv_rows (Inventory rows) int 3
+
 # Visible bar size (excluding inventory and hidden slots).
+# Default: 8; use 9 for Mineclone.
 coolbar.bar_size (bar size) int 8
 
-# Visible inventory size (excluding bar and hidden slots).
-coolbar.inv_size (Inventory rows) int 24
+# Index of the first inventory slot.
+# Default: 9; use 10 for Mineclone.
+coolbar.inv_start (Inventory start) int 9
 
 # Index of the first slot on a bar.
 coolbar.bar_start (bar start) int 1
 
-# Index of the first inventory slot.
-coolbar.inv_start (Inventory start) int 9
-
-# Name of the item in the slot #1.
+# Name of the item(s) in the slot #1.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_1 (Slot 1) string group:sword
 
-# Name of the item in the slot #2.
+# Name of the item(s) in the slot #2.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_2 (Slot 2) string group:shovel
 
-# Name of the item in the slot #3.
+# Name of the item(s) in the slot #3.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_3 (Slot 3) string group:pickaxe
 
-# Name of the item in the slot #4.
+# Name of the item(s) in the slot #4.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_4 (Slot 4) string group:axe
 
-# Name of the item in the slot #5.
+# Name of the item(s) in the slot #5.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_5 (Slot 5) string default:water_bucket
 
-# Name of the item in the slot #6.
+# Name of the item(s) in the slot #6.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_6 (Slot 6) string group:soil
 
-# Name of the item in the slot #7.
-coolbar.slot_7 (Slot 7) string default:apple
+# Name of the item(s) in the slot #7.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
+coolbar.slot_7 (Slot 7) string group:food_apple|group:food_mushroom
 
-# Name of the item in the slot #8.
+# Name of the item(s) in the slot #8.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_8 (Slot 8) string group:torch
 
-# Name of the item in the slot #9.
+# Name of the item(s) in the slot #9.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_9 (Slot 9) string 
 
-# Name of the item in the slot #10.
+# Name of the item(s) in the slot #10.
+# You can set a group ("group:something").
+# You can set many items, separated by "|".
 coolbar.slot_10 (Slot 10) string 

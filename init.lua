@@ -2,12 +2,14 @@ local settings = minetest.settings
 
 -- Visible bar size (excluding inventory and hidden slots).
 local bar_size = tonumber(settings:get "coolbar.bar_size" or 8) --[[@as integer]]
+-- The number of visible inventory rows (excluding bar and hidden slots).
+local inv_rows = tonumber(settings:get "coolbar.inv_rows" or 3) --[[@as integer]]
 -- Visible inventory size (excluding bar and hidden slots).
-local inv_size = tonumber(settings:get "coolbar.inv_size" or 24) --[[@as integer]]
+local inv_size = bar_size * inv_rows
 -- Index of the first slot on a bar.
 local bar_start = tonumber(settings:get "coolbar.bar_start" or 1) --[[@as integer]]
 -- Index of the first inventory slot.
-local inv_start = tonumber(settings:get "coolbar.inv_start" or 9) --[[@as integer]]
+local inv_start = tonumber(settings:get "coolbar.inv_start" or 10) --[[@as integer]]
 -- The last slot on bar
 local bar_end = bar_start + bar_size - 1
 -- The last inventory slot
@@ -20,23 +22,29 @@ local default_bar_slots = {
   "group:axe",
   "default:water_bucket",
   "group:soil",
-  "default:apple",
+  "group:food_apple|group:food_mushroom",
   "group:torch",
 }
--- Array of itemstrings preferred to keep on the bar.
----@type mt.ItemString[]
+-- Items preferred to keep on the bar.
+---@type string[][]
 local preferred_bar_slots = {}
 for i = 1, bar_size do
   local slot =
     tostring(settings:get("coolbar.slot_" .. i) or default_bar_slots[i] or "")
-  preferred_bar_slots[i] = slot
+  preferred_bar_slots[i] = slot:split "|"
 end
 
 -- Check if item corresponds to itemstring, including "group:something" format.
 ---@param item mt.ItemStack
----@param is mt.ItemString
+---@param is string|string[]
 ---@return boolean
 local function item_is(item, is)
+  if type(is) == "table" then
+    for _, value in ipairs(is) do
+      if item_is(item, value) then return true end
+    end
+    return false
+  end
   if is:find "^group:" then
     local group = is:sub(7)
     if item:get_definition().groups[group] then return true end
@@ -114,6 +122,7 @@ end
 local function handle_bar_decrease(player, old_item, new_item, item_index)
   local inv = player:get_inventory()
   local list = inv:get_list "main"
+  ---@type string|string[]
   local target_item = new_item:get_name()
 
   if target_item == "" then
@@ -153,3 +162,21 @@ local function on_player_inv_change(player, old_item, new_item, i, action, info)
 end
 
 minetestia.register_on_player_inventory_change(on_player_inv_change)
+
+--[[ Debug
+log(
+  (
+    "bar_size: %s, inv_rows: %s, inv_size: %s, "
+    .. "bar_start: %s, bar_end: %s, "
+    .. "inv_start: %s, inv_end: %s"
+  ):format(
+    bar_size,
+    inv_rows,
+    inv_size,
+    bar_start,
+    bar_end,
+    inv_start,
+    inv_end
+  )
+)
+]]
