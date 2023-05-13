@@ -22,7 +22,7 @@ local default_bar_slots = {
   "group:axe",
   "default:water_bucket",
   "group:soil",
-  "group:food_apple|group:food_mushroom",
+  "group:food|group:food_apple|group:food_mushroom",
   "group:torch",
 }
 -- Items preferred to keep on the bar.

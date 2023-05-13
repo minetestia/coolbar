@@ -45,7 +45,7 @@ coolbar.slot_6 (Slot 6) string group:soil
 # Name of the item(s) in the slot #7.
 # You can set a group ("group:something").
 # You can set many items, separated by "|".
-coolbar.slot_7 (Slot 7) string group:food_apple|group:food_mushroom
+coolbar.slot_7 (Slot 7) string group:food|group:food_apple|group:food_mushroom
 
 # Name of the item(s) in the slot #8.
 # You can set a group ("group:something").
