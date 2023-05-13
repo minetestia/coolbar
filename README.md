@@ -38,10 +38,11 @@ For `i3` users I recommend to check all checkboxes in its settings:
 `Mineclone` users needs to change `bar_size` from `8` to `9` and `inv_start`
 from `9` to `10` in the mod settings.
 
+Please, be very careful changing these numbers. If the mod crashed, check twice
+if these numbers was correct before reporting a bug!
+
 ## What can be improved
 
-- The engine can not keep track of some inventory changes made manually from
-  mods, so I need to provide additional compatibility for some of them.
 - The order of items in the settings is currently irrelevant. Maintaining a
   strict order is not easy task, requiring to rewrite half the code backwards.
 - Would be cool to add the ability to automatically change settings depending on

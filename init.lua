@@ -9,7 +9,7 @@ local inv_size = bar_size * inv_rows
 -- Index of the first slot on a bar.
 local bar_start = tonumber(settings:get "coolbar.bar_start" or 1) --[[@as integer]]
 -- Index of the first inventory slot.
-local inv_start = tonumber(settings:get "coolbar.inv_start" or 10) --[[@as integer]]
+local inv_start = tonumber(settings:get "coolbar.inv_start" or 9) --[[@as integer]]
 -- The last slot on bar
 local bar_end = bar_start + bar_size - 1
 -- The last inventory slot
@@ -162,6 +162,8 @@ local function on_player_inv_change(player, old_item, new_item, i, action, info)
 end
 
 minetestia.register_on_player_inventory_change(on_player_inv_change)
+
+minetest.register_on_mods_loaded(minetestia.auto_detect_inventory_changes)
 
 --[[ Debug
 log(
