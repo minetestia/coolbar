@@ -50,6 +50,8 @@ if these numbers was correct before reporting a bug!
 
 ---
 
-This mod uses [Minetest LSP-API] annotations.
+This mod uses [Minetest LSP-API] annotations, [StyLua] and [LuaCheck].
 
 [Minetest LSP-API]: https://github.com/minetest-toolkit/minetest-lsp-api
+[StyLua]: https://github.com/JohnnyMorganz/StyLua
+[LuaCheck]: https://github.com/mpeterv/luacheck
