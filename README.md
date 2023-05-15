@@ -47,3 +47,9 @@ if these numbers was correct before reporting a bug!
   strict order is not easy task, requiring to rewrite half the code backwards.
 - Would be cool to add the ability to automatically change settings depending on
   the loaded game.
+
+---
+
+This mod uses [Minetest LSP-API] annotations.
+
+[Minetest LSP-API]: https://github.com/minetest-toolkit/minetest-lsp-api
