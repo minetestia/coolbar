@@ -1,5 +1,7 @@
 local settings = minetest.settings
 
+-- Automatically detect and overwrite core settings for Mineclone game.
+local mineclone = settings:get_bool("coolbar.mineclone_autodetect", true)
 -- Visible bar size (excluding inventory and hidden slots).
 local bar_size = tonumber(settings:get "coolbar.bar_size" or 8) --[[@as integer]]
 -- The number of visible inventory rows (excluding bar and hidden slots).
@@ -163,10 +165,17 @@ end
 
 minetestia.register_on_player_inventory_change(on_player_inv_change)
 
-minetest.register_on_mods_loaded(minetestia.auto_detect_inventory_changes)
+minetest.register_on_mods_loaded(function()
+  ---@diagnostic disable-next-line: undefined-global
+  if mcl_vars and mineclone then
+    bar_size = 9
+    inv_start = 10
+  end
+  minetestia.auto_detect_inventory_changes()
+end)
 
 --[[ Debug
-log(
+minetest.log(
   (
     "bar_size: %s, inv_rows: %s, inv_size: %s, "
     .. "bar_start: %s, bar_end: %s, "

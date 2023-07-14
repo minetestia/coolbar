@@ -3,14 +3,17 @@ coolbar.inv_rows (Inventory rows) int 3
 
 # Visible bar size (excluding inventory and hidden slots).
 # Default: 8; use 9 for Mineclone.
-coolbar.bar_size (bar size) int 8
+coolbar.bar_size (Bar size) int 8
 
 # Index of the first inventory slot.
 # Default: 9; use 10 for Mineclone.
 coolbar.inv_start (Inventory start) int 9
 
 # Index of the first slot on a bar.
-coolbar.bar_start (bar start) int 1
+coolbar.bar_start (Bar start) int 1
+
+# Automatically detect and overwrite core settings for Mineclone game.
+coolbar.mineclone_autodetect (Mineclone autodetect) bool true
 
 # Name of the item(s) in the slot #1.
 # You can set a group ("group:something").
