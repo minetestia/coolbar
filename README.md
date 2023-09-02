@@ -1,3 +1,6 @@
+# THIS REPO IS OUTDATED
+Moved here: <https://notabug.org/minetestia/coolbar>
+
 # Coolbar
 
 Originally I made a simple mod that separates inventory from a bar, allowing you
